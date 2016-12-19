@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:cxf="http://camel.apache.org/schema/cxf" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://camel.apache.org/schema/cxf http://camel.apache.org/schema/cxf/camel-cxf.xsd        
+	http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+	<camelContext id="_camelContext1" xmlns="http://camel.apache.org/schema/spring">
+		<!-- <route id="_route1">
+			<from uri="file:input" />
+			<process ref="dataProcessor" />
+			<log message="Writing data ${body}" />
+			<to uri="file:output" />
+		</route> -->
+		<route id="PersonServiceRoute">
+			<from uri="cxfrs:bean:rsServer?bindingStyle=SimpleConsumer" />
+			<!-- <recipientList> <simple>direct-vm:${header.operationName}</simple> 
+				</recipientList> -->
+			<log message="Received ${body}"></log>
+		</route>
+	</camelContext>
+	<bean id="dataProcessor" class="com.cosmos.processors.DataProcessor" />
+	
+	<!-- <bean id="jsonProvider" class="org.apache.cxf.jaxrs.provider.json.JSONProvider" /> -->
+
+	<cxf:rsServer id="rsServer"
+		address="http://0.0.0.0:1235/myservice"
+		serviceClass="com.cosmos.processors.PersonService"
+		loggingFeatureEnabled="true" loggingSizeLimit="20">
+		<!-- <cxf:providers>
+			<ref bean="jsonProvider" />
+		</cxf:providers> -->
+	</cxf:rsServer>
+</beans>
